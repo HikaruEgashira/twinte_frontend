@@ -1,3 +1,9 @@
+--------------------
+追加部分
+twinte.net frontend製作者として公開します。
+改善部分など多いと思うので、プルリクを頂けるとありがたいです。
+-------------------
+
 # twins_timetable
 
 > twins_timetable nuxt+vuetify project
