@@ -1,0 +1,38 @@
+{
+  "name": "Twinte",
+  "version": "1.0.0",
+  "description": "時間割アプリです",
+  "author": "HikaruEgashira <shighten@gmail.com>",
+  "private": true,
+  "scripts": {
+    "dev-debug": "node --inspect-brk=9229 node_modules/nuxt/bin/nuxt",
+    "dev": "nuxt -s --hostname 0.0.0.0 --port 3000",
+    "build": "nuxt build",
+    "start": "nuxt start -s",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@nuxtjs/google-analytics": "^2.0.2",
+    "@nuxtjs/pwa": "^2.6.0",
+    "async": "^2.6.1",
+    "axios": "^0.18.0",
+    "nuxt": "^2.2.0",
+    "vue-frame": "^1.0.7",
+    "vuetify": "^1.4.3"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.7.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-html": "^4.0.6",
+    "eslint-plugin-import": "^2.15.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "vuetify-loader": "^1.0.2"
+  }
+}
