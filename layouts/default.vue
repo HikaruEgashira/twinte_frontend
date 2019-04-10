@@ -8,7 +8,7 @@
     >
       <v-toolbar-title class='white--text'>Twin:te</v-toolbar-title>
     </v-toolbar>
-    <!-- ログイン -->
+    <!-- コンポネント -->
     <login />
     <!-- サイドバー -->
     <v-navigation-drawer
@@ -43,9 +43,17 @@
           </v-list-tile-content>
         </v-list-tile>
       <v-list dense class='py-0'>
-        <v-list-tile @click="deleteItems">
+        <v-list-tile @click="$store.commit('reLogin', true)">
           <v-list-tile-action>
-            <v-icon>settings</v-icon>
+            <v-icon>add</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>この学期の時間割データ追加</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click="confirm('時間割データを端末内から削除します', 'delAll')">
+          <v-list-tile-action>
+            <v-icon>delete_sweep</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>時間割データの消去</v-list-tile-title>
@@ -54,15 +62,6 @@
       </v-list>
       </v-list>
       <v-list dense class='pa-2 ml-2'>
-        <!-- <v-list-tile href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-url="https://twinte.net" data-hashtags="Twinte" data-lang="ja" data-show-count="false">
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-          <v-list-tile-action>
-            <v-icon>bubble_chart</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Twitterで共有</v-list-tile-title>
-          </v-list-tile-content>`
-        </v-list-tile> -->
         <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-url="https://twinte.net" data-hashtags="Twinte" data-lang="ja" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       </v-list>
     </v-navigation-drawer>
@@ -116,23 +115,56 @@
         </v-list-tile>
       </v-list>
     </v-bottom-sheet>
+    <!-- confirm -->
+    <v-dialog
+      v-model="Confirm.bool"
+      max-width="290"
+    >
+      <v-card style="border-radius: 8px">
+        <v-card-title class="title">{{ Confirm.text }}</v-card-title>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="teal darken-1"
+            flat="flat"
+            @click="Confirm.bool = false"
+          >
+            Disagree
+          </v-btn>
+
+          <v-btn
+            color="teal darken-1"
+            flat="flat"
+            @click="confirmAction(Confirm.func)"
+          >
+            Agree
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 <script>
 import login from '~/components/default_login.vue'
+import alert from '~/components/default_alert.vue'
 export default {
   // el: '#app',
   components: {
-    login
+    login,
+    alert
   },
   data () {
     return {
+      Confirm: { text: '', func: '', bool: false },
       drawer: null,
       sheet: false,
       navigationItems: [
         { title: 'このアプリの使い方', icon: 'question_answer', link: 'tutorial' },
         { title: 'About', icon: 'group', link: 'about' },
-        { title: '表示設定', icon: 'dashboard', link: 'view' }
+        { title: '表示設定', icon: 'dashboard', link: 'view' },
+        { title: '時間割の共有', icon: 'camera', link: 'qrcode' }
       ],
       tiles: [
         { title: '春A' },
@@ -153,42 +185,43 @@ export default {
     this.$store.dispatch('restore')
   },
   methods: {
-    async login () {
-      await this.$store.dispatch('login', {
-        id: this.form.id,
-        pass: this.form.pass
-      })
-      this.loginDialogIsShow = false
+    confirm (text, func) {
+      this.Confirm = { text, func, bool: true }
+    },
+    confirmAction (func) {
+      switch (func) {
+        case 'delAll':
+          this.deleteItems()
+          break
+      }
     },
     async deleteItems () {
       localStorage.removeItem('twinte-data')
       location.href = '/'
     },
     changeSemester (index) {
-      let name = 'haruA'
       switch (index) {
         case 0:
-          name = 'haruA'
+          this.$store.commit('updated', { items: this.$store.state.items[index], number: [], season: 'haruA' })
           break
         case 1:
-          name = 'haruB'
+          this.$store.commit('updated', { items: this.$store.state.items[index], number: [], season: 'haruB' })
           break
         case 2:
-          name = 'haruC'
+          this.$store.commit('updated', { items: this.$store.state.items[index], number: [], season: 'haruC' })
           break
         case 3:
-          name = 'akiA'
+          this.$store.commit('updated', { items: this.$store.state.items[index], number: [], season: 'akiA' })
           break
         case 4:
-          name = 'akiB'
+          this.$store.commit('updated', { items: this.$store.state.items[index], number: [], season: 'akiB' })
           break
         case 5:
-          name = 'akiC'
+          this.$store.commit('updated', { items: this.$store.state.items[index], number: [], season: 'akiC' })
           break
         default:
           break
       }
-      this.$store.commit('updated', { items: this.$store.state.items[index], season: name, change: true })
       this.sheet = false
     }
   }

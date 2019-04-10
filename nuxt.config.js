@@ -16,20 +16,19 @@ module.exports = {
       {
         hid: 'description',
         name: 'description',
-        content: '時間割アプリです'
+        content: 'このアプリは筑波大学生向けの時間割作成アプリです。'
       },
-      { name: 'format-detection', content: 'telephone=no' }
+      { name: 'format-detection', content: 'telephone=no' },
+      {
+        property: 'og:image', content: 'https://twinte.net/icon.png'
+      }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/icon.png' },
-      {
-        rel: 'stylesheet',
-        href:
-          'https://fonts.googleapis.com/css?family=Noto+Sans+JP:300,500|Material+Icons'
-      }
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/icon?family=Material+Icons' }
     ]
   },
-  plugins: ['~/plugins/vuetify.js'],
+  plugins: ['~/plugins/vuetify.js', '~/plugins/cooper.js'],
   css: ['~/assets/style/app.styl'],
   /*
    ** Customize the progress bar color
@@ -51,6 +50,8 @@ module.exports = {
         })
       }
       config.plugins.push(new VuetifyLoaderPlugin())
+      // const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+      // config.plugins.push(new HardSourceWebpackPlugin())
     }
   },
   /** 高速化 */

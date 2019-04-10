@@ -9,7 +9,7 @@
     <v-layout>
       <v-flex xs2>
         <v-card class='text-xs-center' elevation='1' tile color=''>
-          {{ this.$store.state.season.realName }}
+          {{ this.$store.state.season[this.$store.state.nowSeason].realName }}
         </v-card>
         <v-card :height=tableSize elevation='1' tile v-for='(r, index) in timeTable' :key='index' class='text-xs-center font-weight-bold' color=''>
         <ul class="pa-1 mx-1">
@@ -28,7 +28,7 @@
           <v-card-text class='pa-0'>
             <ul class='pa-0 mx-1'>
               <li :style="{ fontSize: fontSize / theme.table[0].size + 'px' }" v-if="theme.table[0].show">{{ row.number }}</li>
-              <li :style="{ fontSize: fontSize / theme.table[1].size + 1 + 'px' }" v-if="theme.table[1].show" class="font-weight-bold">{{ row.name | cutName(12) }}</li>
+              <li :style="{ fontSize: fontSize / theme.table[1].size + 1 + 'px' }" v-if="theme.table[1].show" class="font-weight-bold">{{ row.name | cutName(16) }}</li>
               <li :style="{ fontSize: fontSize / theme.table[2].size + 'px' }" v-if="theme.table[2].show">{{ row.classroom | cutName(5) }}</li>
               <li :style="{ fontSize: fontSize / theme.table[3].size + 'px' }" v-if="theme.table[3].show">{{ row.teacher | cutName(5) }}</li>
             </ul>
@@ -37,7 +37,7 @@
       </v-flex>
     </v-layout>
     <!-- 変更画面 -->
-    <v-dialog v-model='dialog.isShow' width='800px'>
+    <v-dialog v-model='dialog.isShow' width='800px' style="border-radius: 8px">
       <v-card v-show='!dialog.more'>
         <v-card-title class='grey lighten-4 py-4 title hidden-xs-only'>Detail</v-card-title>
         <v-container grid-list-sm class='px-4'>
@@ -46,13 +46,18 @@
               <v-form>
                 <v-container>
                   <v-layout>
-                    <v-flex xs11>
+                    <v-flex xs8>
                       <v-text-field v-model='dialog.className' label='class name' required @keyup.enter.prevent="dialogSave">
                       </v-text-field>
                     </v-flex>
-                    <v-flex xs1>
-                      <v-btn icon @click='dialogSave'>
+                    <v-flex xs2>
+                      <v-btn icon @click="dialogSave()">
                         <v-icon>done</v-icon>
+                      </v-btn>
+                    </v-flex>
+                    <v-flex xs2>
+                      <v-btn icon @click="confirmI('このアイテムを削除しますか？', 'del')">
+                        <v-icon>delete</v-icon>
                       </v-btn>
                     </v-flex>
                   </v-layout>
@@ -76,9 +81,38 @@
             <v-flex xs12>
               <v-card>
                 <v-card-text>担当教師: {{ dialog.teacher }}</v-card-text></v-card></v-flex></v-layout>
+          <v-layout>
+            <v-flex xs12>
+              <v-expansion-panel>
+                <v-expansion-panel-content>
+                  <div slot="header">授業出席: {{ value | trunc }}%<v-progress-linear
+                :rotate="270"
+                :size="100"
+                :width="15"
+                :value="value"
+                color="teal"
+              >
+              </v-progress-linear></div>
+                  <v-card>
+                    <v-card-text>授業回数: {{ dialog.absent + dialog.attend }}回</v-card-text>
+              <v-card-text>出席: {{ dialog.attend }}回<v-btn icon color="success lighten-5 black--text" @click="dialog.attend++">+</v-btn><v-fab-transition><v-btn icon color="primary lighten-5 black--text" v-show="dialog.attend > 0" @click="dialog.attend--">-</v-btn></v-fab-transition></v-card-text>
+              <v-card-text>欠席: {{ dialog.absent }}回<v-btn icon color="success lighten-5 black--text" @click="dialog.absent++">+</v-btn><v-fab-transition><v-btn icon color="primary lighten-5 black--text" v-show="dialog.absent > 0" @click="dialog.absent--">-</v-btn></v-fab-transition></v-card-text>
+                  </v-card>
+                </v-expansion-panel-content>
+              </v-expansion-panel></v-flex></v-layout>
+          <v-layout>
+            <v-flex xs12>
+              <v-textarea
+                name="memo"
+                label="memo"
+                v-model='dialog.memo'
+              ></v-textarea></v-flex></v-layout>
         </v-container>
         <v-card-actions>
-          <div id='vue-frame' @click='dialog.more = true' class="px-4">
+          <v-btn flat color='success' :href=dialog.url v-if="isSafari() || dialog.url.indexOf('https') !== 0">
+            シラバス
+          </v-btn>
+          <div id='vue-frame' @click='dialog.more = true' class="px-4" v-else>
             <vue-frame text='シラバス' :url=dialog.url frame='myframe'></vue-frame>
           </div>
           <v-spacer></v-spacer>
@@ -99,7 +133,7 @@
           grid-list-sm
           class='px-0 pb-0'
         >
-          <v-flex xs12 class="outer">
+          <v-flex xs12>
             <iframe id='myframe' height='400em' width='100%' frameborder='0' allowfullscreen>
             </iframe>
           </v-flex>
@@ -108,6 +142,35 @@
           <v-spacer></v-spacer>
           <v-btn flat color='success' @click='dialog.more = false'>
             Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- confirm -->
+    <v-dialog
+      v-model="Confirm.bool"
+      max-width="290"
+    >
+      <v-card style="border-radius: 8px">
+        <v-card-title class="title">{{ Confirm.text }}</v-card-title>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn
+            color="teal darken-1"
+            flat="flat"
+            @click="Confirm.bool = false"
+          >
+            Disagree
+          </v-btn>
+
+          <v-btn
+            color="teal darken-1"
+            flat="flat"
+            @click="confirmAction(Confirm.func)"
+          >
+            Agree
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -122,6 +185,7 @@ export default {
   components: { VueFrame },
   data () {
     return {
+      Confirm: { text: '', func: '', bool: false },
       fontSize: 0,
       tableSize: 0,
       dialog: {
@@ -135,7 +199,10 @@ export default {
         season: '',
         time: '',
         classroom: '',
-        teacher: ''
+        teacher: '',
+        attend: 0,
+        absent: 0,
+        memo: ''
       },
       timeTable: [
         ['8:40', '9:55'],
@@ -151,26 +218,65 @@ export default {
   computed: {
     // store/index.jsから参照
     items: function () {
-      return this.$store.state.items[this.$store.state.season.array]
+      return this.$store.state.items[this.$store.state.nowSeason]
     },
     theme: function () {
       return this.$store.state.theme
+    },
+    value: function () {
+      if (this.dialog.attend === 0) return 0
+      return this.dialog.attend / (this.dialog.attend + this.dialog.absent) * 100
     }
   },
   mounted () {
     this.$nextTick(() => {
       // テーブルの高さ調整
-      this.tableSize = (this.$refs.container.clientHeight - 19 - 16) / this.timeTable.length
+      this.tableSize = (this.$refs.container.clientHeight - 19 - 16 - 1) / this.timeTable.length
       this.adjustFontsize()
     })
   },
   filters: {
     cutName: function (value, limit) {
-      if (value.search(/[E]/) === 0) return value.slice(0, 24)
+      if (value.search(/[E]/) === 0) return value.slice(0, 27)
       return value.slice(0, limit)
+    },
+    trunc (num, n) {
+      if (!num) return num
+      const digit = String(num).split('.')[1]
+        ? String(num).split('.')[1].length
+        : null
+      if (!digit) return num
+      Math.trunc = Math.trunc || function (x) {
+        return x < 0 ? Math.ceil(x) : Math.floor(x)
+      }
+      if (n > 1) {
+        num *= 10 ** n
+        return Math.trunc(num) / 10 ** n
+      } else {
+        return Math.trunc(num)
+      }
     }
   },
   methods: {
+    confirmI (text, func) {
+      this.Confirm = { text, func, bool: true }
+    },
+    confirmAction (func) {
+      switch (func) {
+        case 'del':
+          this.deleteItem()
+          break
+        case 'save':
+          this.dialogSave()
+          break
+      }
+    },
+    deleteItem () {
+      this.$store.commit('update', { dialog: this.dialog, name: false })
+      this.$store.dispatch('save', { state: this.$store.state })
+      this.dialog.isShow = false
+      this.Confirm.bool = false
+    },
     dialogAction: function (col, row) {
       // クリックしたときに詳細を表示
       if (this.items[col][row].number !== '') {
@@ -184,17 +290,25 @@ export default {
         this.dialog.time = this.items[col][row].time
         this.dialog.classroom = this.items[col][row].classroom
         this.dialog.teacher = this.items[col][row].teacher
+        this.dialog.attend = this.items[col][row].attend
+        this.dialog.absent = this.items[col][row].absent
+        this.dialog.memo = this.items[col][row].memo
         switch (this.dialog.number.split('')[0]) {
+          case 'G':
+            this.dialog.url = `http://www.coins.tsukuba.ac.jp/syllabus/${this.items[col][row].number}.html`
+            break
           default:
             this.dialog.url = `https://kdb.tsukuba.ac.jp/syllabi/2018/${this.items[col][row].number}/jpn/#course-title`
             break
         }
       }
     },
-    dialogSave: function () {
+    dialogSave () {
+      this.confirm = true
       this.dialog.isShow = false
-      this.$store.commit('update', this.dialog)
+      this.$store.commit('update', { dialog: this.dialog, name: true })
       this.$store.dispatch('save', { state: this.$store.state })
+      this.Confirm.bool = false
     },
     adjustFontsize () {
       const nowHeight = this.tableSize
@@ -231,6 +345,10 @@ export default {
         default:
           return ''
       }
+    },
+    isSafari () {
+      const userAgent = window.navigator.userAgent
+      return userAgent.indexOf('iPhone') !== -1 || userAgent.indexOf('iPad') !== -1
     }
   }
 }
@@ -243,8 +361,5 @@ li {
 }
 [v-cloak] {
   display: none;
-}
-div.outer {
-  -webkit-overflow-scrolling: touch;
 }
 </style>

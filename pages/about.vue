@@ -62,7 +62,9 @@ export default {
   },
   computed: {
     randMenbers: function () {
-      return Math.floor(Math.random() * 2) === 1 ? [this.menbers[1], this.menbers[0]] : this.menbers
+      return Math.floor(Math.random() * 2) === 1
+        ? this.menbers.reverse()
+        : this.menbers
     }
   }
 }
