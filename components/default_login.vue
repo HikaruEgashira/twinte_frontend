@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-dialog
-      :value='!isLogin || reLogin'
+      :value='!isLogin || isRelogin'
       fullscreen
       hide-overlay
       transition='dialog-bottom-transition'
@@ -10,7 +10,7 @@
         <v-toolbar dark color='teal darken-1'>
           <v-toolbar-title>Twin:te</v-toolbar-title>
           <v-spacer/>
-          <v-btn icon @click="$store.commit('reLogin', false)" v-if='reLogin'>
+          <v-btn icon @click="$store.commit('relogin', false)" v-if='isRelogin'>
             <v-icon>clear</v-icon>
           </v-btn>
         </v-toolbar>
@@ -34,7 +34,7 @@
             <vue-frame text='利用規約(こちらをクリック)' url='https://twinte.net/api/info.html' frame='info'></vue-frame>
           </v-card-text>
           <v-card-text>
-            <v-checkbox v-model='selected' label='利用規約に同意する' color='success' @keyup.enter='login'></v-checkbox>
+            <v-checkbox v-model='term' label='利用規約に同意する' color='success' @keyup.enter='login'></v-checkbox>
           </v-card-text>
 
           <v-card-title class='title font-weight-bold'>時間割を作る</v-card-title>
@@ -78,9 +78,9 @@
                       </v-card>
                     </v-dialog>
 
-                    <v-text-field v-model='task' label='授業番号を入力してください' solo @keydown.enter='create'>
+                    <v-text-field v-model='task' label='授業番号を入力してください' solo @keydown.enter='createTask'>
                       <v-fade-transition slot='append'>
-                        <v-icon v-if='task' @click='create'>add_circle</v-icon>
+                        <v-icon v-if='task' @click='createTask'>add_circle</v-icon>
                       </v-fade-transition>
                     </v-text-field>
 
@@ -99,7 +99,7 @@
                             <v-spacer></v-spacer>
 
                             <v-scroll-x-transition>
-                              <v-icon @click='deleteItem(i)'>delete</v-icon>
+                              <v-icon @click='delTask(i)'>delete</v-icon>
                             </v-scroll-x-transition>
                           </v-list-tile>
                         </template>
@@ -125,7 +125,7 @@
                     </div>
                   </v-tab-item>
 
-                  <v-tab-item :key='2'>
+                  <v-tab-item :key='2' touchless>
                     <v-dialog v-model='dialog3' width='500'>
                       <v-btn
                         absolute
@@ -183,7 +183,7 @@
                               placeholder-color="black"
                               :placeholder-font-size="14"
                               remove-button-color="teal"
-                              :show-remove-button="false"
+                              :remove-button-size="40"
                               :zoom-speed="5"
                               id="canvas"
                       ></croppa>
@@ -269,7 +269,7 @@
         </v-container>
         <v-card-actions>
           <v-card-text class='py-0 my-0'>
-            <v-checkbox v-model='selected' label='利用規約に同意する' color='success'></v-checkbox>
+            <v-checkbox v-model='term' label='利用規約に同意する' color='success'></v-checkbox>
           </v-card-text>
           <v-spacer></v-spacer>
           <v-btn flat color='success' @click='info = false'>Close</v-btn>
@@ -292,8 +292,13 @@
 <script>
 import VueFrame from 'vue-frame'
 import Tesseract from 'tesseract.js'
+import alert from '~/components/default_alert.vue'
+
 export default {
-  components: { VueFrame },
+  components: {
+    VueFrame,
+    alert
+  },
   data () {
     return {
       croppa: {},
@@ -306,7 +311,7 @@ export default {
       dialog3: false,
       log: false,
       info: false,
-      selected: false,
+      term: false,
       uploadFile: null,
       uploadedImage: null,
       message: '',
@@ -326,19 +331,20 @@ export default {
     isLoading: function () {
       return this.$store.state.isLoading
     },
-    reLogin: function () {
-      return this.$store.state.reLogin
+    isRelogin: function () {
+      return this.$store.state.isRelogin
     }
   },
   methods: {
     addItem () {
       this.value = this.text.split('\n')
       Array.prototype.push.apply(this.tasks, this.value)
+      // alert.displayAlert('追加完了。授業番号登録を見てみてください。')
       this.message = '追加完了。授業番号登録を見てみてください。'
       this.log = true
     },
     onFileChange (e) {
-      if (!this.selected) {
+      if (!this.term) {
         this.message = '利用規約に同意してからご利用ください。'
       } else {
         let files = e.target.files
@@ -355,7 +361,7 @@ export default {
       reader.readAsDataURL(file)
     },
     async recognizeImage () {
-      if (!this.selected) {
+      if (!this.term) {
         this.message = '利用規約に同意してからご利用ください。'
         this.log = true
       } else if (this.uploadedImage === '') {
@@ -379,7 +385,7 @@ export default {
       }
     },
     async numLogin () {
-      if (!this.selected) {
+      if (!this.term) {
         this.message = '利用規約に同意してからご利用ください。'
       } else {
         await this.$store.dispatch('number', { number: this.tasks, semester: 'haruA' })
@@ -388,7 +394,7 @@ export default {
         await this.$store.dispatch('number', { number: this.tasks, semester: 'akiA' })
         await this.$store.dispatch('number', { number: this.tasks, semester: 'akiB' })
         await this.$store.dispatch('number', { number: this.tasks, semester: 'akiC' })
-        this.$store.commit('reLogin', false)
+        this.$store.commit('relogin', false)
         if (this.$store.state.isLogin) {
           this.tasks = []
           this.$store.dispatch('save', { state: this.$store.state })
@@ -399,11 +405,11 @@ export default {
       }
       this.log = true
     },
-    create () {
+    createTask () {
       this.tasks.push(this.task.toUpperCase())
       this.task = null
     },
-    deleteItem (i) {
+    delTask (i) {
       this.tasks.splice(i, 1)
     },
     isSafari () {
@@ -418,7 +424,7 @@ export default {
       this.uploadFile = files[0]
     },
     async upload () {
-      if (!this.selected) {
+      if (!this.term) {
         this.message = '利用規約に同意してからご利用ください。'
         this.log = true
       } else if (this.selectSemester === '') {
@@ -441,7 +447,7 @@ export default {
               semester: this.selectSemester
             })
             .then(res => {
-              this.$store.commit('reLogin', false)
+              this.$store.commit('relogin', false)
               this.message = this.$store.state.isLogin
                 ? '時間割を作成しました。'
                 : '時間割の取得に失敗しました。'

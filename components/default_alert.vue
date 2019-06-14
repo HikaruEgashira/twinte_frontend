@@ -13,12 +13,14 @@
 
 <script>
 export default {
-  computed: {
-    message: function () {
-      return this.$store.state.alert.message
-    },
-    log: function () {
-      return this.$store.state.alert.log
+  data: {
+    message: false,
+    log: ''
+  },
+  methods: {
+    displayAlert (message) {
+      this.message = message
+      this.log = true
     }
   }
 }

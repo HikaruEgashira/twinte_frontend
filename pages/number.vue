@@ -87,7 +87,7 @@ export default {
           await this.$store.dispatch('number', { number: nums, semester: 'akiC' })
           break
       }
-      this.$store.commit('reLogin', false)
+      this.$store.commit('relogin', false)
       if (save) this.$store.dispatch('save', { state: this.$store.state })
       this.message = this.$store.state.isLogin ? '時間割を作成しました。' : '時間割の取得に失敗しました。'
       this.log = true

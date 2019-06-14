@@ -4,6 +4,10 @@
   "description": "筑波大学生専用の時間割アプリです。",
   "author": "HikaruEgashira <shighten@gmail.com>",
   "private": true,
+  "vetur": {
+    "tags": "dist/vetur/tags.json",
+    "attributes": "dist/vetur/attributes.json"
+  },
   "scripts": {
     "dev-debug": "node --inspect-brk=9229 node_modules/nuxt/bin/nuxt",
     "dev": "nuxt -s --hostname 0.0.0.0 --port 3000",

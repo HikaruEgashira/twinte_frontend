@@ -1,6 +1,7 @@
 import axios from 'axios'
 // 初期状態
 export const state = () => ({
+  username: 'ゲスト',
   nowSeason: 0,
   season: [
     { name: 'haruA', realName: '春A' },
@@ -12,8 +13,7 @@ export const state = () => ({
   ],
   isLogin: false,
   isLoading: false,
-  reLogin: false,
-  alert: { message: '', log: false },
+  isRelogin: false,
   theme: {
     table: [
       { key: 'number', size: 2, show: false, name: '授業番号' },
@@ -62,8 +62,10 @@ export const mutations = {
           classObj.teacher = ''
           classObj.time = ''
         }
-        const source = { attend: 0, absent: 0, memo: '' }
-        Object.assign(classObj, source)
+        if (Object.keys(classObj).length !== 9) {
+          const source = { attend: 0, absent: 0, memo: '' }
+          Object.assign(classObj, source)
+        }
       })
     })
     switch (season) {
@@ -130,13 +132,69 @@ export const mutations = {
     state.alert.message = message
     state.alert.log = log
   },
-  reLogin (state, bool) {
-    state.reLogin = bool
+  relogin (state, bool) {
+    state.isRelogin = bool
   }
 }
 
 // 非同期処理やローカルストレージとの通信
 export const actions = {
+  async signin (context, { password, email, name }) {
+    await axios.post('https://dev.twinte.net/api/register', {
+      name,
+      email,
+      password,
+      g_recaptcha_token: '6LeHKp8UAAAAALlUIbPOBJtkOWpKiWRXV0a7mVxt'
+    }).data.then(items => {
+      console.log(items)
+    })
+    console.log('signin')
+  },
+  async login (context, { password, email, name }) {
+    await axios.post('https://dev.twinte.net/api/login', {
+      email,
+      password,
+      g_recaptcha_token: '6LeHKp8UAAAAALlUIbPOBJtkOWpKiWRXV0a7mVxt'
+    }).data.then(items => {
+      console.log(items)
+    })
+    console.log('login')
+  },
+  async update (context, { number }) {
+    await axios.post('https://dev.twinte.net/api/update', { number })
+      .data.then(items => {
+        console.log(items)
+      })
+    console.log('update')
+  },
+  async course (context, { ViewSeason }) {
+    await axios.post('https://dev.twinte.net/api/course', { view_season: ViewSeason })
+      .data.then(items => {
+        console.log(items)
+      })
+    console.log('course')
+  },
+  async store (context, { number }) {
+    await axios.post('https://dev.twinte.net/api/store', { number })
+      .data.then(items => {
+        console.log(items)
+      })
+    console.log('store')
+  },
+  async detail (context) {
+    await axios.get('https://dev.twinte.net/api/detail')
+      .data.then(items => {
+        console.log(items)
+      })
+    console.log('detail')
+  },
+  async logout (context) {
+    await axios.get('https://dev.twinte.net/logout')
+      .data.then(items => {
+        console.log(items)
+      })
+    console.log('logout')
+  },
   // 授業番号
   async number (context, { number, semester }) {
     context.commit('loading', true)
