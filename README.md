@@ -1,57 +1,10 @@
-# twins_timetable
+# twin:te
+
+- アプリケーションURL => https://twinte.net
+- アプリ紹介LP => https://twinte.netlify.com
+- 公式Twitter => https://twitter.com/te_twin
 
 > twins_timetable nuxt+vuetify project
-
-## やったとこ
-
-- テーブルの作成
-- 時間割をタップで詳細を見られるように
-- 縦を中央に揃える
-
-## TODO
-
-### 1
-
-- 文字サイズの変更
-- 教室コード（number）の文字コードなどを利用して分かりやすい色付け
-- weekをタップすると一日だけ表示とか（候補）
-
-### 2
-
-- Loading画面
-- componentの分割
-- サイズ変更
-- カラー変更
-- 学期選択
-- アプリ紹介
-- homeボタンのバグ修正
-- theme変更されない
-
-## Build Setup
-
-NUXTを利用しています
-
-``` bash
-npm i　#or yarn
-vue ui
-```
-
-``` bash
-# install dependencies
-$ npm install # Or yarn install
-
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm start
-
-# generate static project
-$ npm run generate
-```
-
-For detailed explanation on how things work, check out the [Nuxt.js](https://github.com/nuxt/nuxt.js) and [Vuetify.js](https://vuetifyjs.com/) documentation.
 
 ## 動作仕様
 
