@@ -1,3 +1,5 @@
+**[Duplicated] => see https://github.com/twin-te/twinte-front**
+
 # twin:te
 
 - アプリケーションURL => https://twinte.net
