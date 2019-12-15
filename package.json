@@ -19,7 +19,7 @@
     "@nuxtjs/google-analytics": "^2.0.2",
     "@nuxtjs/pwa": "^2.6.0",
     "async": "^2.6.1",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "hard-source-webpack-plugin": "^0.13.1",
     "nuxt": "^2.2.0",
     "tesseract.js": "^1.0.14",
