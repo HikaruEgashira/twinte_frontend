@@ -21,7 +21,7 @@
     "async": "^2.6.1",
     "axios": "^0.18.0",
     "hard-source-webpack-plugin": "^0.13.1",
-    "nuxt": "^2.2.0",
+    "nuxt": "^2.18.1",
     "tesseract.js": "^1.0.14",
     "vue-croppa": "^1.3.8",
     "vue-frame": "^1.0.7",
